@@ -23,20 +23,22 @@ resource "aws_subnet" "main" {
   map_public_ip_on_launch = true
 }
 
+data "http" "my_public_ip" {
+  url = "http://ipv4.icanhazip.com"
+}
+
 resource "aws_security_group" "elb" {
   name        = "ca-demo-elb-sg"
   description = "Used in the terraform"
   vpc_id      = var.vpc_id
 
-  # HTTP access from anywhere
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${chomp(data.http.my_public_ip.body)}/32"]
   }
 
-  # outbound internet access
   egress {
     from_port   = 0
     to_port     = 0
@@ -49,7 +51,6 @@ resource "aws_security_group" "elb" {
   }
 }
 
-
 # Our default security group to access
 # the instances over SSH and HTTP
 resource "aws_security_group" "web" {
@@ -57,7 +58,6 @@ resource "aws_security_group" "web" {
   description = "Used in the terraform"
   vpc_id      = var.vpc_id
 
-  # SSH access from anywhere
   ingress {
     from_port   = 22
     to_port     = 22
@@ -65,15 +65,13 @@ resource "aws_security_group" "web" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # HTTP access from the VPC
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${chomp(data.http.my_public_ip.body)}/32"]
   }
 
-  # outbound internet access
   egress {
     from_port   = 0
     to_port     = 0
@@ -126,29 +124,26 @@ resource "aws_instance" "web_instance" {
     private_key = file("C:/Users/slevi/.ssh/ca-demo.pem")
   }
 
-  provisioner "file" {
-    source      = "${path.module}/app.py"
-    destination = "~/app.py"
-  }
+//  provisioner "remote-exec" {
+//    inline = [
+//      "sudo yum -y update",
+//      "sudo amazon-linux-extras install -y nginx1",
+//      "sudo service nginx start"
+//    ]
+//  }
 
-  provisioner "remote-exec" {
-    inline = [
-      "sudo yum install -y python python-setuptools python-dev build-essential python-pip python-mysqldb git",
-      "sudo pip install flask",
-      "FLASK_APP=app.py flask run --host=0.0.0.0"
-    ]
-  }
+//  provisioner "file" {
+//    source      = "${path.module}/site.html"
+//    destination = "/usr/share/nginx/html/site.html"
+//  }
 
   provisioner "local-exec" {
-    command = "chrome.exe http://${self.public_ip}:5000/companies"
+    command = "cmd /c \"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe\" http://${self.public_ip}/site.html"
+    interpreter = ["PowerShell", "-Command"]
   }
 
   tags = {
     Name = "ca-demo-terraform",
   }
 
-}
-
-output "web_instance_public_ip" {
-  value = aws_instance.web_instance.public_ip
 }

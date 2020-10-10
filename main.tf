@@ -1,6 +1,6 @@
 provider "aws" {
   region  = "eu-central-1"
-  profile = "ca-demo"
+  profile = var.aws_profile
 }
 
 resource "aws_vpc" "main" {
@@ -14,13 +14,8 @@ module "deploy_demo_web_app" {
   cidr_block        = "10.22.0.0/24"
 }
 
-output "web_app_url" {
-  value = "http://${module.deploy_demo_web_app.web_instance_public_ip}:5000/companies"
-}
-
 module "test" {
   source = "./modules/tests"
 
   web_app_public_ip = module.deploy_demo_web_app.web_instance_public_ip
-  web_app_port      = "5000"
 }

@@ -1,7 +1,5 @@
 #! /bin/bash
 sudo yum -y update
 sudo amazon-linux-extras install -y nginx1
+echo "Hello from your web app" > /usr/share/nginx/html/site.html
 sudo service nginx start
-sudo yum install -y python python-setuptools python-dev build-essential python-pip python-mysqldb git
-sudo pip install flask
-FLASK_APP=app.py flask run --host=0.0.0.0

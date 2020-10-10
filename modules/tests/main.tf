@@ -1,20 +1,15 @@
 terraform {
   required_providers {
-    restapi = {
-      source = "fmontezuma/restapi"
-      version = "1.14.1"
+    http = {
+      source = "hashicorp/http"
+      version = "1.2.0"
     }
   }
 }
 
-provider "restapi" {
-  uri                  = "http://${var.web_app_public_ip}:${var.web_app_port}"
-  debug                = false
-  write_returns_object = false
+provider "http" {
 }
 
-//data "restapi_object" "get_id_1" {
-//  path          = "/companies"
-//  search_key    = "id"
-//  search_value  = "1"
-//}
+data "http" "test" {
+  url = "http://${var.web_app_public_ip}/site.html"
+}
