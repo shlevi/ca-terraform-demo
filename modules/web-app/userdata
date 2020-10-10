@@ -1,5 +1,0 @@
-#! /bin/bash
-sudo yum -y update
-sudo amazon-linux-extras install -y nginx1
-echo "Hello from your web app" > /usr/share/nginx/html/site.html
-sudo service nginx start

@@ -1,5 +1,9 @@
+terraform {
+  required_version = ">= 0.13"
+}
+
 provider "aws" {
-  region  = "eu-central-1"
+  region  = var.aws_region
   profile = var.aws_profile
 }
 
@@ -15,14 +19,7 @@ module "demo_web_app_infra" {
 }
 
 module "demo_web_app" {
-  source            = "./modules/web-app"
+  source            = "../modules/web-app-instance"
   security_group_id = module.demo_web_app_infra.security_group_id
   subnet_id         = module.demo_web_app_infra.subnet_id
-
-}
-
-module "test" {
-  source = "./modules/tests"
-
-  web_app_public_ip = module.demo_web_app.web_instance_public_ip
 }
