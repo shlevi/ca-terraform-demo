@@ -1,11 +1,13 @@
-variable "vpc_id" {
+variable "aws_profile" {
   type = string
 }
 
-variable "cidr_block" {
+variable "security_group_id" {
   type = string
 }
 
-variable "route_table_id" {
+variable "subnet_id" {
   type = string
 }
+
+
