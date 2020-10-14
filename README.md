@@ -11,6 +11,3 @@ Execute the following commands to run this module:
 ```
 terraform init
 ```
-```
-terraform apply -var aws_profile="<your aws profile>" -auto-approve
-```
